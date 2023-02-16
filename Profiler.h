@@ -3,6 +3,9 @@
 #include <fstream>
 #include <chrono>
 
+// change to true to enable macros
+#define A_PROFILING_ENABLED false
+
 namespace profiling {
 	class Profile {
 	public:
@@ -34,7 +37,6 @@ namespace profiling {
 	};
 }
 
-#define A_PROFILING_ENABLED false
 #if A_PROFILING_ENABLED
 	#define A_PROFILE_NEW_SESSION(name, filepath) profiling::ProfileSession::Begin(name, filepath)
 	#define A_PROFILE_END_SESSION() profiling::ProfileSession::End()
