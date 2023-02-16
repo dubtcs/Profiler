@@ -7,52 +7,47 @@
 #include <fstream>
 #include <chrono>
 
-namespace axt {
+namespace profiling {
+	class Profile {
 
-	namespace profiling {
-
-		class AXT_API Profile {
-		public:
-			Profile(const char* name) : mName{ name }, mStopped{ false } {}
-			~Profile();
-			void Stop();
-		private:
-			const char* mName;
-			std::chrono::high_resolution_clock::time_point mStartTime{ std::chrono::high_resolution_clock::now() };
-			bool mStopped;
+	public:
+		Profile(const char* name) : mName{ name }, mStopped{ false } {}
+		~Profile();
+		void Stop();
+	private:
+		const char* mName;
+		std::chrono::high_resolution_clock::time_point mStartTime{ std::chrono::high_resolution_clock::now() };
+		bool mStopped;
+	};
+	
+	class ProfileSession {
+	private:
+		struct ProfileData {
+			const char* name;
+			long long mStart, mEnd;
 		};
-
-		class AXT_API ProfileSession {
-		private:
-			struct ProfileData {
-				const char* name;
-				long long mStart, mEnd;
-			};
-		public:
-			static void Begin(const char* sessionName, const char* filepath = "ProfilerResultsAXT.json");
-			static void End();
-			static void WriteData(const ProfileData& data);
-		private:
-			static void Header();
-			static void Footer();
-			static ProfileSession mInstance;
-			std::ofstream mFileStream;
-			int mProfileCount{ 0 };
-		};
-
-	}
-
+	public:
+		static void Begin(const char* sessionName, const char* filepath = "ProfilerResults.json");
+		static void End();
+		static void WriteData(const ProfileData& data);
+	private:
+		static void Header();
+		static void Footer();
+		static ProfileSession mInstance;
+		std::ofstream mFileStream;
+		int mProfileCount{ 0 };
+	};
 }
 
-#define AXT_PROFILING_ENABLED false
-#if AXT_PROFILING_ENABLED
-	#define AXT_PROFILE_NEW_SESSION(name, filepath) axt::profiling::ProfileSession::Begin(name, filepath)
-	#define AXT_PROFILE_END_SESSION() axt::profiling::ProfileSession::End()
-	#define AXT_PROFILE_SCOPE(name) axt::profiling::Profile profile##__LINE__{name}
-	#define AXT_PROFILE_FUNCTION() AXT_PROFILE_SCOPE(__FUNCSIG__)
+#define A_PROFILING_ENABLED false
+#if A_PROFILING_ENABLED
+	#define A_PROFILE_NEW_SESSION(name, filepath) profiling::ProfileSession::Begin(name, filepath)
+	#define A_PROFILE_END_SESSION() profiling::ProfileSession::End()
+	#define A_PROFILE_SCOPE(name) profiling::Profile profile##__LINE__{name}
+	#define A_PROFILE_FUNCTION() A_PROFILE_SCOPE(__FUNCSIG__)
 #else
-	#define AXT_PROFILE_NEW_SESSION(name, filepath)
-	#define AXT_PROFILE_END_SESSION()
-	#define AXT_PROFILE_SCOPE(name)
-	#define AXT_PROFILE_FUNCTION()
+	#define A_PROFILE_NEW_SESSION(name, filepath)
+	#define A_PROFILE_END_SESSION()
+	#define A_PROFILE_SCOPE(name)
+	#define A_PROFILE_FUNCTION()
 #endif
