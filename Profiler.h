@@ -1,15 +1,10 @@
 #pragma once
 
-// static profiler
-
-#include "axt/Core.h"
-
 #include <fstream>
 #include <chrono>
 
 namespace profiling {
 	class Profile {
-
 	public:
 		Profile(const char* name) : mName{ name }, mStopped{ false } {}
 		~Profile();
